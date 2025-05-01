@@ -30,8 +30,8 @@ connectDB()
     .catch((e) => console.log("Connection error: ", e))
 
 
-import userRoutes from './routes/user.route.js'
-import taskRoutes from './routes/task.route.js'
+import userRoutes from './routes/user.routes.js'
+import taskRoutes from './routes/task.routes.js'
 
 app.use("/api/users", userRoutes)
 app.use("/api/tasks", taskRoutes)

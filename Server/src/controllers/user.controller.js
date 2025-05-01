@@ -7,22 +7,22 @@ const signupUser = async (req, res) => {
     try {
         const { name, email, password, country } = req.body
         if ([name, email, password, country].some((field) => field?.trim() === "")) {
-            return res.status(400).json(new ApiResponse(400, "All input fields must be filled"))
+            return res.status(400).json(new ApiResponse(400, null, "All input fields must be filled"))
         }
 
-        let user = await User.findOne({ email })
-        if (user) {
+        const existingUser = await User.findOne({ email })
+        if (existingUser) {
             return res.status(400).json(new ApiResponse(400, null, "User already exists"))
         }
 
-        user = await User.create({ name, email, password, country })
+        const user = await User.create({ name, email, password, country })
 
         const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
         const createdUser = await User.findById(user._id).select(" _id email name country ")
         const userData = CryptoJS.AES.encrypt(JSON.stringify(createdUser), process.env.VITE_KEY).toString()
 
-        if (!createdUser) return res.status(500).json(new ApiResponse(500, "Something went wrong while registering the user"))
+        if (!createdUser) return res.status(500).json(new ApiResponse(500, null, "Something went wrong while registering the user"))
 
         return res.status(201)
             .cookie("accessToken", accessToken, options)
@@ -57,7 +57,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body
+        const { email, password } = req.body        
         if (!email || email.trim() === "") {
             return res.status(400).json(new ApiResponse(400, null, "Email is required!!"))
         }

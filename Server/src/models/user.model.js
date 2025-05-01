@@ -3,21 +3,21 @@ import bycrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
 const userSchema = new Schema({
-    name: { type: String, unique: true, required: true },
+    name: { type: String, required: true },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    country: { type: String, unique: true },
+    country: { type: String, required: true },
     refreshToken: String,
     projects: {
         type: [
             {
                 title: {
                     type: String,
-                    unique: true
+                    required: true
                 },
                 description: {
                     type: String,
-                    unique: true
+                    required: true
                 }
             }
         ],
@@ -29,14 +29,16 @@ function arrayLimit(value) {
     return value.length <= 4
 }
 
-userSchema.pre("save", async (next) => {
-    if (this.isModified("password")) return next()
+userSchema.pre("save", async function (next){
+    if (!this.isModified("password")) return next()
 
     this.password = await bycrypt.hash(this.password, 10)
     next()
 })
 
-userSchema.methods.isPasswordCorrect = async (password) => await bycrypt.compare(password, this.password)
+userSchema.methods.isPasswordCorrect = async function(password){
+    return await bycrypt.compare(password, this.password)
+}
 
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
