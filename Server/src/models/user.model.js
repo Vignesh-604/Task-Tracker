@@ -6,8 +6,28 @@ const userSchema = new Schema({
     name: { type: String, unique: true, required: true },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    country: { type: String, unique: true }
+    country: { type: String, unique: true },
+    refreshToken: String,
+    projects: {
+        type: [
+            {
+                title: {
+                    type: String,
+                    unique: true
+                },
+                description: {
+                    type: String,
+                    unique: true
+                }
+            }
+        ],
+        validate: [arrayLimit, "{PATH} exceeds limit of 4"]
+    }
 })
+
+function arrayLimit(value) {
+    return value.length <= 4
+}
 
 userSchema.pre("save", async (next) => {
     if (this.isModified("password")) return next()
