@@ -16,13 +16,11 @@ const CreateItemDialog = ({
         setItemData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Handle form submission
     const handleSubmit = (e) => {
         e.preventDefault();
         onSubmit();
     };
 
-    // Reset and close dialog
     const handleCancel = () => {
         setItemData({ title: '', description: '' });
         onClose();

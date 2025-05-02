@@ -6,7 +6,7 @@ import { Trash2 } from 'lucide-react';
 import CreateItemDialog from './CreateItem';
 
 export default function UserDashboard() {
-    // State management
+    
     const navigate = useNavigate()
     const [userData, setUserData] = useState({});
     const [loading, setLoading] = useState(true);
@@ -14,7 +14,7 @@ export default function UserDashboard() {
     const [selectedProject, setSelectedProject] = useState(null);
     const [projectData, setProjectData] = useState(null);
     
-    // Dialog states
+
     const [showProjectDialog, setShowProjectDialog] = useState(false);
     const [showTaskDialog, setShowTaskDialog] = useState(false);
     const [newProject, setNewProject] = useState({ title: '', description: '' });
@@ -40,7 +40,7 @@ export default function UserDashboard() {
         fetchUserData();
     }, []);
 
-    // Fetch project tasks when a project is selected
+    
     useEffect(() => {
         const fetchProjectTasks = async () => {
             if (!selectedProject) return;
@@ -60,16 +60,9 @@ export default function UserDashboard() {
         fetchProjectTasks();
     }, [selectedProject]);
 
-    // Handle project selection
-    const handleProjectClick = (project) => {
-        setSelectedProject(project);
-    };
-
-    // Create new project
     const handleCreateProject = async () => {
         try {
             const response = await axios.post('/api/users/project', newProject);
-            // Update user data with new project
             setUserData(response.data.data);
             setShowProjectDialog(false);
             setNewProject({ title: '', description: '' });
@@ -91,7 +84,6 @@ export default function UserDashboard() {
     const handleDeleteProject = async (projectId) => {
         try {
             const response = await axios.delete(`/api/users/project/${projectId}`);
-            // Update user data with new project
             setUserData(response.data.data);
             showAlert({
                 title: 'Project Deleted!',
@@ -108,13 +100,11 @@ export default function UserDashboard() {
         }
     };
 
-    // Create new task
     const handleCreateTask = async () => {
         if (!selectedProject) return;
 
         try {
             const response = await axios.post(`/api/tasks/${selectedProject._id}`, newTask);
-            // Update project data with new task
             setProjectData(response.data);
             setShowTaskDialog(false);
             setNewTask({ title: '', description: '' });
@@ -133,11 +123,9 @@ export default function UserDashboard() {
         }
     };
 
-    // Update task status
     const handleUpdateTaskStatus = async (taskId, newStatus) => {
         try {
             await axios.put(`/api/tasks/${taskId}`, { status: newStatus });
-            // Update local task data
             setProjectData({
                 ...projectData,
                 data: {
@@ -157,7 +145,6 @@ export default function UserDashboard() {
     const handleDeleteTask = async (taskId) => {
         try {
             await axios.delete(`/api/tasks/${taskId}`);
-            // Remove task from local data
             setProjectData({
                 ...projectData,
                 data: {
@@ -197,7 +184,6 @@ export default function UserDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-100">
-            {/* Header */}
             <header className="bg-blue-600 text-white shadow-md">
                 <div className="container mx-auto px-4 py-6">
                     <h1 className="text-3xl font-bold">User Dashboard</h1>
@@ -243,7 +229,7 @@ export default function UserDashboard() {
                                             ? 'border-blue-500 bg-blue-50'
                                             : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                                             }`}
-                                        onClick={() => handleProjectClick(project)}
+                                        onClick={() => setSelectedProject(project)}
                                     >
                                         <div>
                                             <h3 className="font-medium text-lg text-gray-800">{project.title}</h3>
