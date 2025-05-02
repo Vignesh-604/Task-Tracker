@@ -12,3 +12,15 @@ export function decrypt() {
         return false
     }
 }
+
+import Swal from 'sweetalert2'
+
+export const showAlert = ({ title, text, icon = 'success', timer = 2000 }) => {
+    return Swal.fire({
+        title,
+        text,
+        icon,
+        showConfirmButton: false,
+        timer
+    });
+};

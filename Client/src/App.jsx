@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Routes, Route } from "react-router-dom"
 import LandingPage from './Pages/LandingPage'
-import { Home } from 'lucide-react'
+import Home from './Pages/Home'
+
 
 function App() {
 

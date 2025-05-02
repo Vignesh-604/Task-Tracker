@@ -44,20 +44,20 @@ const generateAccessAndRefreshTokens = async (userId) => {
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
 
-        user.refreshToken = refreshToken                // save the refreshToken in user's db
+        user.refreshToken = refreshToken
         await user.save({ validateBeforeSave: false })
 
         return { accessToken, refreshToken }
 
     } catch (error) {
-        return res.status(500).json(new ApiResponse(500, error, "Something went wrong while adding tokenscreating project"))
+        throw new Error("Token generation failed: " + error.message)
     }
 }
 
 
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body        
+        const { email, password } = req.body
         if (!email || email.trim() === "") {
             return res.status(400).json(new ApiResponse(400, null, "Email is required!!"))
         }
@@ -103,29 +103,25 @@ const logoutUser = async (req, res) => {
 }
 
 const getUser = async (req, res) => {
-    const user = await User.findById(req.user._id).select(" -password ")
-    return res.status(200).json(new ApiResponse(200, user, "Something went wrong while logging in"))
+    const user = await User.findById(req.user._id).select(" -password -refreshToken ")
+    return res.status(200).json(new ApiResponse(200, user, "Data fetched"))
 }
 
 const createProject = async (req, res) => {
-    try {
-        const { title, description } = req.body;
 
-        const user = await User.findById(req.user._id)
-        if (!user) {
-            return res.status(404).json(new ApiResponse(404, null, "User not found"))
-        }
-        if (user.projects.length >= 4) {
-            return res.status(400).json(new ApiResponse(400, null, "Maximum 4 projects allowed"))
-        }
-        user.projects.push({ title, description })
-        const newUser = await user.save()
+    const { title, description } = req.body;
 
-        return res.status(200).json(new ApiResponse(200, newUser, "Project added"))
-
-    } catch (error) {
-        return res.status(500).json(new ApiResponse(500, error, "Something went wrong while creating project"))
+    const user = await User.findById(req.user._id)
+    if (!user) {
+        return res.status(404).json(new ApiResponse(404, null, "User not found"))
     }
+    if (user.projects.length >= 4) {
+        return res.status(400).json(new ApiResponse(400, null, "Maximum 4 projects allowed"))
+    }
+    user.projects.push({ title, description })
+    const newUser = await user.save()
+
+    return res.status(200).json(new ApiResponse(200, newUser, "Project added"))
 }
 
 const deleteProject = async (req, res) => {
@@ -137,7 +133,7 @@ const deleteProject = async (req, res) => {
             return res.status(404).json(new ApiResponse(404, null, "User not found"))
         }
 
-        user.projects.filter((pro) => pro._id.toString() !== projectId)
+        user.projects = user.projects.filter((pro) => pro._id.toString() !== projectId.toString())
         const newUser = await user.save()
 
         await Task.deleteMany({ project: projectId })

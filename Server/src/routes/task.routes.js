@@ -4,7 +4,7 @@ import verifyJWT from "../middlewares/auth.middleware.js"
 
 const router = Router()
 
-router.post("/", verifyJWT, createTask)
+router.post("/:projectId", verifyJWT, createTask)
 
 router.get("/:projectId", verifyJWT, getTasksForProject)
 
