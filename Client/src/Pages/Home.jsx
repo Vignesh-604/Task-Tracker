@@ -2,18 +2,18 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { decrypt, showAlert } from '../utils';
 import { useNavigate } from 'react-router-dom';
-import { Trash2 } from 'lucide-react';
+import { LogOut, Trash2 } from 'lucide-react';
 import CreateItemDialog from './CreateItem';
 
 export default function UserDashboard() {
-    
+
     const navigate = useNavigate()
     const [userData, setUserData] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedProject, setSelectedProject] = useState(null);
     const [projectData, setProjectData] = useState(null);
-    
+
 
     const [showProjectDialog, setShowProjectDialog] = useState(false);
     const [showTaskDialog, setShowTaskDialog] = useState(false);
@@ -40,7 +40,7 @@ export default function UserDashboard() {
         fetchUserData();
     }, []);
 
-    
+
     useEffect(() => {
         const fetchProjectTasks = async () => {
             if (!selectedProject) return;
@@ -59,6 +59,15 @@ export default function UserDashboard() {
 
         fetchProjectTasks();
     }, [selectedProject]);
+
+    const handleLogout = async () => {
+        try {
+            await axios.get("/api/users/logout", { withCredentials: true });
+            navigate("/");
+        } catch (err) {
+            console.error("Logout failed", err);
+        }
+    };
 
     const handleCreateProject = async () => {
         try {
@@ -195,8 +204,8 @@ export default function UserDashboard() {
                     {/* Left Column: User Profile and Projects List */}
                     <div className="md:col-span-1 space-y-8">
                         {/* User Profile Card */}
-                        <div className="bg-white rounded-lg shadow-md p-6">
-                            <div className="flex items-center space-x-4 mb-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center space-x-4">
                                 <div className="bg-blue-500 text-white rounded-full h-16 w-16 flex items-center justify-center text-2xl font-bold">
                                     {userData?.name?.charAt(0)}
                                 </div>
@@ -206,6 +215,13 @@ export default function UserDashboard() {
                                     <p className="text-gray-600">{userData?.country}</p>
                                 </div>
                             </div>
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center cursor-pointer space-x-2 text-red-600 hover:text-red-800"
+                            >
+                                <LogOut className="h-5 w-5" />
+                                <span className="font-medium">Logout</span>
+                            </button>
                         </div>
 
                         {/* Projects List */}
